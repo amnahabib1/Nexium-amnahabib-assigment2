@@ -12,12 +12,15 @@ export default function Home() {
   const [urdu, setUrdu] = useState('')
 
   const handleSummarise = async () => {
+    // 🟡 Fake scraped text from blog
     const fakeScrapedText = `This is dummy scraped content from the blog at ${url}. It contains a lot of valuable information about the topic.`
     setFullText(fakeScrapedText)
 
+    // 🟢 Static logic: first 15 words
     const staticSummary = fakeScrapedText.split(' ').slice(0, 15).join(' ') + '...'
     setSummary(staticSummary)
 
+    // 🔵 Urdu translation using dictionary
     const urduDictionary: Record<string, string> = {
       "This is dummy scraped content from the blog at": "یہ بلاگ سے حاصل کردہ فرضی مواد ہے",
       "It contains a lot of valuable information about the topic.": "اس میں موضوع کے بارے میں قیمتی معلومات شامل ہیں۔"
@@ -29,11 +32,13 @@ export default function Home() {
       .join(' ')
     setUrdu(translated)
 
+    // 🔴 Save summary to Supabase
     await fetch('/api/save-summary', {
       method: 'POST',
       body: JSON.stringify({ url, summary: staticSummary, translated }),
     })
 
+    // 🟠 Save full text to MongoDB
     await fetch('/api/save-fulltext', {
       method: 'POST',
       body: JSON.stringify({ url, fullText: fakeScrapedText }),
@@ -51,6 +56,7 @@ export default function Home() {
 
       {summary && (
         <div className="space-y-3">
+          <Textarea value={fullText} readOnly />
           <Textarea value={summary} readOnly />
           <Textarea value={urdu} readOnly />
         </div>
